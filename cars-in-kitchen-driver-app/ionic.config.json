@@ -1,0 +1,7 @@
+{
+  "name": "cars-in-kitchen-driver",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

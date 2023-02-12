@@ -1,0 +1,19 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      CAR - Cars in kitchen
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+    <div>remote command: {{vehicleService.steerCommand | json}}</div>
+    <div>Last command sent time: {{vehicleService.commandSendDate | date:"hh:mm:ss"}}</div>
+
+    <div id="local-wrapper" style="min-height: 500px">
+
+    </div>
+
+
+</ion-content>
