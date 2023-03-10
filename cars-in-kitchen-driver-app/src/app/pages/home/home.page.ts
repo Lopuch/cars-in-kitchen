@@ -43,62 +43,19 @@ export class HomePage implements AfterViewInit {
   localSteerCommands: SteerCommand = {}
   lastSendSteerCommands: SteerCommand = {};
 
+  joined = false;
+
   constructor() {
 // Create an instance of the Agora Engine
     this.agoraEngine = AgoraRTC.createClient({mode: "rtc", codec: "vp8"});
     this.rtmClient = AgoraRTM.createInstance(this.appId);
 
-    window.onkeydown = (e: KeyboardEvent) => {
 
-      switch (e.key) {
-        case "w":
-          this.localSteerCommands.f = true;
-          break;
-
-        case "s":
-          this.localSteerCommands.b = true;
-          break;
-
-        case "a":
-          this.localSteerCommands.l = true;
-          break;
-
-        case "d":
-          this.localSteerCommands.r = true;
-          break;
-      }
-
-      this.sendPosition(true).then();
-
-    }
-
-    window.onkeyup = (e: KeyboardEvent) => {
-
-      switch (e.key) {
-        case "w":
-          this.localSteerCommands.f = false;
-          break;
-
-        case "s":
-          this.localSteerCommands.b = false;
-          break;
-
-        case "a":
-          this.localSteerCommands.l = false;
-          break;
-
-        case "d":
-          this.localSteerCommands.r = false;
-          break;
-      }
-
-      this.sendPosition(true).then();
-    }
   }
 
-  async ngAfterViewInit() {
 
-    // Dynamically create a container in the form of a DIV element to play the remote video track.
+  async onJoinClick() {
+// Dynamically create a container in the form of a DIV element to play the remote video track.
     this.remotePlayerContainer = document.createElement("div");
     // Dynamically create a container in the form of a DIV element to play the local video track.
     this.localPlayerContainer = document.createElement("div");
@@ -149,7 +106,72 @@ export class HomePage implements AfterViewInit {
       });
     });
 
+    this.joined = true;
+
     await this.join();
+  }
+
+  async ngAfterViewInit() {
+
+    setTimeout(()=>{
+      window.location.reload();
+    }, 60 * 60 * 2); // Refresh page after two hours -> to prevent resource drainage
+
+    setTimeout(() => {
+
+
+      window.onkeydown = (e: KeyboardEvent) => {
+        console.log("Key down: ", e);
+
+        switch (e.key) {
+          case "w":
+            this.localSteerCommands.f = true;
+            break;
+
+          case "s":
+            this.localSteerCommands.b = true;
+            break;
+
+          case "a":
+            this.localSteerCommands.l = true;
+            break;
+
+          case "d":
+            this.localSteerCommands.r = true;
+            break;
+        }
+
+        this.sendPosition(true).then();
+
+      }
+
+      window.onkeyup = (e: KeyboardEvent) => {
+
+        switch (e.key) {
+          case "w":
+            this.localSteerCommands.f = false;
+            break;
+
+          case "s":
+            this.localSteerCommands.b = false;
+            break;
+
+          case "a":
+            this.localSteerCommands.l = false;
+            break;
+
+          case "d":
+            this.localSteerCommands.r = false;
+            break;
+        }
+
+        this.sendPosition(true).then();
+      }
+
+      console.log("Key bindings set");
+    }, 3000);
+
+
   }
 
   async sendPosition(dontSendIfSame = false) {
@@ -204,7 +226,7 @@ export class HomePage implements AfterViewInit {
 
     setInterval(async () => {
       await this.sendPosition();
-    }, 250)
+    }, 2000)
 
   }
 

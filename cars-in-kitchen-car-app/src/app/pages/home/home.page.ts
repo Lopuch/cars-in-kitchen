@@ -1,7 +1,6 @@
 import {AfterViewInit, Component} from "@angular/core";
 import AgoraRTC, {IAgoraRTCClient} from "agora-rtc-sdk-ng";
 import AgoraRTM, {RtmChannel, RtmClient} from "agora-rtm-sdk";
-import {SteerCommand} from "../../models/steer-command";
 import {VehicleService} from "../../services/vehicle/vehicle.service";
 
 @Component({
@@ -40,6 +39,10 @@ export class HomePage implements AfterViewInit {
 
   rtmChannel?: RtmChannel;
 
+  joinedVideo = false;
+  joinedMessaging = false;
+  isCameraTesting = false;
+
   constructor(
     public vehicleService: VehicleService,
   ) {
@@ -50,6 +53,10 @@ export class HomePage implements AfterViewInit {
   }
 
   async ngAfterViewInit() {
+
+    setTimeout(()=>{
+      window.location.reload();
+    }, 60 * 60 * 3); // Refresh page after three hours -> to prevent resource drainage
 
     // Dynamically create a container in the form of a DIV element to play the remote video track.
     this.remotePlayerContainer = document.createElement("div");
@@ -102,15 +109,14 @@ export class HomePage implements AfterViewInit {
       });
     });
 
-    await this.join();
+    //await this.join();
   }
 
   // Listen to the Join button click event.
-  async join() {
+  async joinVideo() {
 
+    try {
 
-    const joinVideo = false;
-    if(joinVideo) {
       // Join a channel.
       await this.rtcEngine.join(this.appId, this.channel, this.token, this.uid);
 
@@ -126,8 +132,17 @@ export class HomePage implements AfterViewInit {
       // Play the local video track.
       this.localVideoTrack.play(this.localPlayerContainer);
       console.log("publish success!");
-    }
 
+      this.joinedVideo = true;
+    }
+    catch(ex)
+    {
+      console.log("joinVideo ERROR: ", ex);
+      await this.leaveVideo();
+    }
+  }
+
+  async joinMessaging(){
 
     await this.rtmClient.login({uid: Date.now().toString(), token: undefined});
 
@@ -157,21 +172,34 @@ export class HomePage implements AfterViewInit {
 
     await this.rtmChannel.join();
 
+    this.joinedMessaging = true;
+
   }
 
   // Listen to the Leave button click event.
-  async leave() {
+  async leaveVideo() {
     // Destroy the local audio and video tracks.
-    this.localAudioTrack.close();
-    this.localVideoTrack.close();
+    this.localAudioTrack?.close();
+    this.localVideoTrack?.close();
     // Remove the containers you created for the local video and remote video.
     // this.removeVideoDiv(this.remotePlayerContainer.id);
-    this.removeVideoDiv(this.localPlayerContainer.id);
+    //         this.removeVideoDiv(this.localPlayerContainer.id);
     // Leave the channel
     await this.rtcEngine.leave();
-    console.log("You left the channel");
     // Refresh the page for reuse
-    window.location.reload();
+
+
+    this.joinedVideo = false;
+  }
+
+  async leaveMessaging(){
+
+    await this.rtmChannel?.leave();
+    await await this.rtmClient.logout();
+
+    this.joinedMessaging = false;
+
+    console.log("Logged out");
   }
 
 
@@ -183,4 +211,33 @@ export class HomePage implements AfterViewInit {
     }
   };
 
+  async onTestVideoClick() {
+    const constraints = {
+      video: {
+        width: {
+          min: 1280,
+          ideal: 1920,
+          max: 2560,
+        },
+        height: {
+          min: 720,
+          ideal: 1080,
+          max: 1440,
+        },
+      },
+    }
+
+    const video = document.querySelector('#videoTester')! as HTMLVideoElement;
+    video.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
+
+
+    this.isCameraTesting = true;
+  }
+
+  async onStopCameraTest() {
+    const video = document.querySelector('#videoTester')! as HTMLVideoElement;
+    video.srcObject = null;
+
+    this.isCameraTesting = false;
+  }
 }

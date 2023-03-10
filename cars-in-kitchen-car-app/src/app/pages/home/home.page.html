@@ -1,19 +1,42 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      CAR - Cars in kitchen
+      CAR - Cars in kitchen - join video
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-
+  <div class="wrapper">
     <div>remote command: {{vehicleService.steerCommand | json}}</div>
     <div>Last command sent time: {{vehicleService.commandSendDate | date:"hh:mm:ss"}}</div>
+
+    <div>
+      <ion-button [disabled]="joinedVideo" (click)="joinVideo()">Join video</ion-button>
+      <ion-button [disabled]="!joinedVideo" (click)="leaveVideo()">Leave video</ion-button>
+    </div>
+
+    <div>
+      <ion-button [disabled]="joinedMessaging" (click)="joinMessaging()">Join messaging</ion-button>
+      <ion-button [disabled]="!joinedMessaging" (click)="leaveMessaging()">Leave messaging</ion-button>
+    </div>
+    <div>
+      Send commands
+      <ion-checkbox [(ngModel)]="vehicleService.sendCommands"></ion-checkbox>
+    </div>
+
+    <div>
+      <ion-button [disabled]="joinedVideo || isCameraTesting" (click)="onTestVideoClick()">Test camera</ion-button>
+      <ion-button [disabled]="!isCameraTesting" (click)="onStopCameraTest()">Stop camera test</ion-button>
+    </div>
 
     <div id="local-wrapper" style="min-height: 500px">
 
     </div>
 
+    <div style="width:100%;height:100px">
+      <video autoplay id="videoTester"></video>
+    </div>
+  </div>
 
 </ion-content>

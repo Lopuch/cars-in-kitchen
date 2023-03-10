@@ -20,6 +20,7 @@ export class VehicleService {
   steerCommand: SteerCommand = {};
   commandSendDate?: Date;
 
+  sendCommands = false;
 
   constructor(
     private http: HttpClient,
@@ -105,6 +106,12 @@ export class VehicleService {
     const right = !!this.steerCommand.r;
     const forward = !!this.steerCommand.f;
     const backward = !!this.steerCommand.b;
+
+    if(!this.sendCommands){
+      console.log("Not sending commands - its disabled");
+      return;
+    }
+
     await this.http.get(`http://localhost:12345?left=${left}&right=${right}&forward=${forward}&backward=${backward}`).toPromise();
   }
 }

@@ -8,17 +8,17 @@
 
 <ion-content [fullscreen]="true">
 
-    <div>local command: {{localSteerCommands | json}}</div>
+  <ion-button *ngIf="!joined" (click)="onJoinClick()">Join</ion-button>
+
+  <div>local command: {{localSteerCommands | json}}</div>
 
   <div id="remote-wrapper" style="min-height: 500px;">
 
   </div>
 
-    <div id="local-wrapper" style="min-height: 500px">
+  <div id="local-wrapper" style="min-height: 500px">
 
-    </div>
-
-
+  </div>
 
 
 </ion-content>
